@@ -71,7 +71,6 @@ namespace ZedGraph
 
 		private void ApplyToAllPanes( GraphPane primaryPane )
 		{
-			if (_isSynchronizeXAxes || _isSynchronizeYAxes)
 				foreach (var pane in _masterPane.PaneList)
 				{
 					if ( pane != primaryPane )

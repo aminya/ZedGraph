@@ -22,6 +22,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ZedGraph
 {
@@ -237,6 +238,11 @@ namespace ZedGraph
 		/// </returns>
 		public delegate bool ZedMouseEventHandler( ZedGraphControl sender, MouseEventArgs e );
 
+        public delegate bool ZedEditDragHandler(ZedGraphControl sender,
+                                                PointPair newPointPosition,
+                                                int pointBeingEditedIndex,
+                                                CurveItem curveBeingEdited);
+
 		/// <summary>
 		/// Subscribe to this event to provide notification of MouseDown clicks on graph
 		/// objects
@@ -279,6 +285,17 @@ namespace ZedGraph
 		/// </summary>
 		[Bindable( false ), Browsable( false )]
 		private new event MouseEventHandler MouseMove;
+
+        /// <summary>
+        /// Subscribe to be notified when a point is dragged.
+        /// </summary>
+        /// <remarks>
+        /// Return false if you want to cancel the drag event. Return true otherwise.
+        /// </remarks>
+        [Bindable(true), Category("Events"),
+         Description("Subscribe to be notified when a point is dragged")]
+        public event ZedEditDragHandler EditDragEvent;
+
 		/// <summary>
 		/// Subscribe to this event to provide notification of MouseUp clicks on graph
 		/// objects
@@ -489,7 +506,7 @@ namespace ZedGraph
 				_dragEndPt.Offset( 1, 1 );
 				_dragPane = pane;
 			}
-			else if ( pane != null && ( _isEnableHEdit || _isEnableVEdit ) &&
+            else if (_isEnableManualEditing == false && pane != null && (_isEnableHEdit || _isEnableVEdit) &&
 				 ( e.Button == EditButtons && Control.ModifierKeys == EditModifierKeys ) )
 			{
 
@@ -505,6 +522,28 @@ namespace ZedGraph
 				}
 			}
 		}
+
+        /// <summary>
+        /// This functions is used to manually start editing a point. _isEnableManualEditing should
+        /// be set to true if you are going to use this function. Also at least one of
+        /// _isEnableHEdit or _isEnableVEdit should be set to true to determine how editing will
+        /// work. This method is intended to be called from the ZedGraphControl_MouseDown event.
+        /// </summary>
+        /// <param name="pane">The pane that contains to point to edit</param>
+        /// <param name="mousePos">The position of if mouse when this is called.</param>
+        /// <param name="curveToEdit">The curve that contains the point to edit.</param>
+        /// <param name="pointToEditIndex">The index of the point to edit.</param>
+        public void StartEditing(GraphPane pane, Point mousePos, CurveItem curveToEdit, int pointToEditIndex)
+        {
+            Debug.Assert(_isEnableManualEditing && (_isEnableHEdit || _isEnableVEdit));
+
+            _isEditing = true;
+            _dragPane = pane;
+            _dragStartPt = mousePos;
+            _dragCurve = curveToEdit;
+            _dragIndex = pointToEditIndex;
+            _dragStartPair = curveToEdit[pointToEditIndex];
+        }
 
 		/// <summary>
 		/// Set the cursor according to the current mouse location.
@@ -1076,6 +1115,14 @@ namespace ZedGraph
 			if ( _isEnableVEdit )
 				newPt.Y = yScale.DeLinearize( yScale.Linearize( newPt.Y ) +
 							yScale.Linearize( curY ) - yScale.Linearize( startY ) );
+
+            if(this.EditDragEvent != null)
+            {
+                if (this.EditDragEvent(this, newPt, _dragIndex, _dragCurve) == false)
+                {
+                    return;
+                }
+            }
 
 			// save the data back to the point list
 			IPointListEdit list = _dragCurve.Points as IPointListEdit;

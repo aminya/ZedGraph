@@ -575,8 +575,7 @@ namespace ZedGraph
 		/// </remarks>
 		public void AxisChange()
 		{
-			using (var img = new Bitmap((int)this.Rect.Width, (int)this.Rect.Height))
-			using (Graphics g = Graphics.FromImage(img))
+			using ( Graphics g = Graphics.FromHwnd( IntPtr.Zero ) )
 				AxisChange( g );
 		}
 

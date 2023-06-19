@@ -463,6 +463,21 @@ namespace ZedGraph
 			set { _isEnableVEdit = value; }
 		}
 
+        /// <summary>
+        /// Determines whether editing will be handled automatically by ZedGraphControl_MouseDown()
+        /// or manually by StartEditing(). This should be used in conjunction with
+        /// <see cref="IsEnableHEdit" /> and <see cref="IsEnableVEdit" /> to determine whether
+        /// points can be edited vertically or horizontally.
+        /// </summary>
+        [Bindable(true), Category("Display"), NotifyParentProperty(true),
+         DefaultValue(false),
+         Description("true to allow manual editing through the function StartEditing()")]
+        public bool IsEnableManualEditing
+        {
+            get { return _isEnableManualEditing; }
+            set { _isEnableManualEditing = value; }
+        }
+
 		/// <summary>
 		/// Gets or sets a value that determines whether or not zooming is allowed for the control.
 		/// </summary>
@@ -612,13 +627,8 @@ namespace ZedGraph
 		 Description( "Provides access to the SaveFileDialog for the 'Save As' menu item" )]
 		public SaveFileDialog SaveFileDialog
 		{
-            get
-            {
-                if (_saveFileDialog == null)
-                    _saveFileDialog = new SaveFileDialog();
-                return _saveFileDialog;
-            }
-            set { _saveFileDialog = value; }
+			get { return _saveFileDialog; }
+			set { _saveFileDialog = value; }
 		}
 
 		/// <summary>

@@ -118,7 +118,7 @@ namespace ZedGraph
 		/// </remarks>
 		private bool _isShowCopyMessage = true;
 
-        private SaveFileDialog _saveFileDialog;
+		private SaveFileDialog _saveFileDialog = new SaveFileDialog();
 
 		/// <summary>
 		/// private field that determines whether the settings of
@@ -196,6 +196,13 @@ namespace ZedGraph
 		/// value.
 		/// </summary>
 		private bool _isEnableHEdit = false;
+
+        /// <summary>
+        /// Determines whether editing will be handled automatically by ZedGraphControl_MouseDown()
+        /// or manually by StartEditing().
+        /// </summary>
+        private bool _isEnableManualEditing = false;
+
 
 		/// <summary>
 		/// private value that determines whether or not panning is allowed for the control in the

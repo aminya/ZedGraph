@@ -19,7 +19,6 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Text;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
@@ -471,8 +470,6 @@ namespace ZedGraph
 					float shift, float scaledTic )
 		{
 			// draw the outside tic
-		    SmoothingMode smode = g.SmoothingMode;
-            g.SmoothingMode = SmoothingMode.None;
 			if ( this.IsOutside )
 				g.DrawLine( pen, pixVal, shift, pixVal, shift + scaledTic );
 
@@ -491,7 +488,6 @@ namespace ZedGraph
 			// draw the opposite tic
 			if ( this.IsOpposite )
 				g.DrawLine( pen, pixVal, topPix, pixVal, topPix + scaledTic );
-		    g.SmoothingMode = smode;
 		}
 
 		internal Pen GetPen( GraphPane pane, float scaleFactor )
